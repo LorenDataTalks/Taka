@@ -1,25 +1,62 @@
-import logo from './logo.svg';
 import './App.css';
+import PrivateRoute from "./components/private-route";
+import {Routes,Route} from "react-router-dom";
+import React,{Component} from "react";
+import LoginPage from "./pages/auth/login";
+import {GetToken, SetToken} from "./services/token.service";
+import DashboardSimple from "./pages/dashboards/dashboard-simple";
+import RegisterPage from './pages/auth/register';
+import CustomerPage from './pages/customers';
+import MapReport from './pages/usage/map-report';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component{
+
+    constructor(props) {
+        super(props);
+        this.state={
+            token:GetToken() !==undefined && GetToken() !=null,
+        }
+    }
+
+    componentDidMount() {
+        console.log("password",GetToken() !==undefined && GetToken() !=null)
+    }
+
+    updateTokenState(){
+        this.setState({...this.state,token:GetToken()!==undefined})
+    }
+    componentWillUnmount() {
+
+        this.updateTokenState()
+
+        console.log("password","componentWillUnmount")
+    }
+
+    setToken(value){
+        SetToken(value)
+
+        
+        this.updateTokenState()
+
+        console.log("password-setToken",GetToken())
+    }
+    render(){
+        return (
+            <Routes>
+                <Route path="/" element={<PrivateRoute token={this.state.token}><DashboardSimple/></PrivateRoute>} exact />
+
+                <Route path="/home" element={<PrivateRoute token={this.state.token}><DashboardSimple/></PrivateRoute>} exact />
+
+                <Route path="/login" element={<LoginPage setToken={this.setToken.bind(this)}/>} />
+
+                <Route path="/create-account" element={<RegisterPage/>}/>
+
+                <Route path="/customers" element={<CustomerPage/>}/>
+
+                <Route path='/map-report' element={<MapReport/>}></Route>
+            </Routes>
+        );
+  }
 }
 
 export default App;
