@@ -18,6 +18,8 @@ export default function CustomerPage(){
         return onValue(query, (snapshot) => {
         const data = snapshot.val();
 
+        //[{id:"000000",name:"Trash Bin"}]
+
         console.log("response ",data)
 
         if (snapshot.exists()) {

@@ -19,14 +19,64 @@ const Bar=({obj,key})=>(
 class DashboardSimple extends React.Component{
     constructor(props){
         super(props);
+
+
+        let chart1={
+          options: {
+            chart: {
+              id: "basic-bar",
+              height: 350,
+            },
+            xaxis: {
+              categories: ["2023-03-10", "2023-03-11", "2023-03-12", "2023-03-14", "2023-03-15", "2023-03-16", "2023-03-17", "2023-03-18", "2023-03-19"]
+            },
+            title: {
+              text: 'Daily Bin records',
+              align: 'left'
+            },
+          },
+          series: [
+            {
+              name: "bin-1",
+              data: [30, 40, 45, 50, 49, 60, 70, 91]
+            },
+            {
+              name: "bin-2",
+              data: [30, 50, 55, 10, 39, 19, 30, 41]
+            },
+            {
+              name: "bin-3",
+              data: [20, 80, 10, 15, 56, 77, 90, 61]
+            }
+          ],
+        }
         this.state = {
-            options: {
+            chart1:chart1,
+            options2: {
               chart: {
-                id: "basic-bar"
+                id: "basic-bar",
+                height: 350,
               },
               xaxis: {
                 categories: ["2023-03-10", "2023-03-11", "2023-03-12", "2023-03-14", "2023-03-15", "2023-03-16", "2023-03-17", "2023-03-18", "2023-03-19"]
-              }
+              },
+              title: {
+                text: 'Product Trends by Month',
+                align: 'left'
+              },
+            },
+            options3: {
+              chart: {
+                id: "basic-bar",
+                height: 350,
+              },
+              xaxis: {
+                categories: ["2023-03-10", "2023-03-11", "2023-03-12", "2023-03-14", "2023-03-15", "2023-03-16", "2023-03-17", "2023-03-18", "2023-03-19"]
+              },
+              title: {
+                text: 'Product Trends by Month',
+                align: 'left'
+              },
             },
             series: [
               {
@@ -35,11 +85,15 @@ class DashboardSimple extends React.Component{
               }
             ],
             bins:[
-              {name:"Smart Monitor 1", level: 200,location:{
+              {name:"Number of Bins", level: 3,location:{
                 longitude: -0.2938847,
                 latitude: 1.234784
               }},
-              {name:"Smart Monitor 2", level: 80,location:{
+              {name:"Smart Monitor 1", level: 80,location:{
+                longitude: -0.2938847,
+                latitude: 1.234784
+              }},
+              {name:"Smart Monitor 2", level: 70,location:{
                 longitude: -0.2938847,
                 latitude: 1.234784
               }}
@@ -63,28 +117,58 @@ class DashboardSimple extends React.Component{
         return(
             <LayoutApp>
 
-              <div className="row justify-space-between">
+              <div className="row">
+                <div className="col-8">
+                <div className="row justify-space-between">
                {bars}
               </div>
 
+              
+
               <div className="row">
-                <div className="card col-4">
+                <div className="card col-6 mx-1">
 
                   <div className="mixed-chart">
                         <Chart
-                        options={this.state.options}
-                        series={this.state.series}
+                        options={this.state.chart1.options}
+                        series={this.state.chart1.series}
                         type="line"
-                        width="500"
+                        
+                        />
+                    </div>
+                </div>
+
+                <div className="card col-6 mx-1">
+
+                  <div className="mixed-chart">
+                        <Chart
+                        options={this.state.options2}
+                        series={this.state.series}
+                        type="bar"
+                        
+                        />
+                    </div>
+                </div>
+
+                <div className="card col-6 mx-1">
+
+                  <div className="mixed-chart">
+                        <Chart
+                        options={this.state.options3}
+                        series={this.state.series}
+                        type="bar"
+                        title="Bin By count"
+                        
                         />
                     </div>
                 </div>
               </div>
 
-             
+                </div>
+                <div className="col-4">
 
-              
-
+                </div>
+              </div>
             </LayoutApp>
         )
     }
