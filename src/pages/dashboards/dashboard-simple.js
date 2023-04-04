@@ -3,10 +3,12 @@ import React from "react";
 import LayoutApp from "../../components/layout-app";
 import Chart from "react-apexcharts";
 
+import { onValue, ref,getDatabase } from "firebase/database";
+import { MainDatabase } from "../../firebase-connectors/closed-loren";
 
 const Bar=({obj,key})=>(
    
-  <div className="card col-3 mx-1">
+  <div className="card col-4">
     <div className="card-body">
       <h3>{obj.name}</h3>
       <small>{obj.level}</small>
@@ -105,6 +107,30 @@ class DashboardSimple extends React.Component{
 
     }
 
+    componentDidMount(){
+      console.log("componentDidMount")
+
+      const db=MainDatabase;
+
+      const query = ref(db, "bin_monitor_1");
+
+        return onValue(query, (snapshot) => {
+        
+          const data = snapshot.val();
+
+          let gadgets=[];
+
+          
+
+          Object.values(data).map((instance,key) => {
+            console.log(""+key,instance);
+            gadgets.push({...instance.end_device_ids,})
+            
+          });
+
+        });
+    }
+
     render() {
 
       
@@ -116,26 +142,27 @@ class DashboardSimple extends React.Component{
 
         return(
             <LayoutApp>
+              <h2 className="text-center bg-white ">Taka Smart Bin Analytics</h2>
 
               <div className="row">
                 <div className="col-8">
                 <div className="row justify-space-between">
-               {bars}
-              </div>
+                   {bars}
+                </div>
 
               
 
               <div className="row">
                 <div className="card col-6 mx-1">
 
-                  <div className="mixed-chart">
-                        <Chart
-                        options={this.state.chart1.options}
-                        series={this.state.chart1.series}
-                        type="line"
-                        
-                        />
-                    </div>
+                    <div className="mixed-chart">
+                          <Chart
+                          options={this.state.chart1.options}
+                          series={this.state.chart1.series}
+                          type="line"
+                          
+                          />
+                      </div>
                 </div>
 
                 <div className="card col-6 mx-1">
@@ -144,9 +171,7 @@ class DashboardSimple extends React.Component{
                         <Chart
                         options={this.state.options2}
                         series={this.state.series}
-                        type="bar"
-                        
-                        />
+                        type="bar" />
                     </div>
                 </div>
 
@@ -166,6 +191,63 @@ class DashboardSimple extends React.Component{
 
                 </div>
                 <div className="col-4">
+
+                   <div className="card card-primary mb-1">
+                     <div className="card-body">
+                      <h3>Select bin status</h3>
+                      <select className='form-control'>
+                        <option value='1'>Full </option>
+                        <option value='2'>Empty </option>
+                        <option value='3'>Nearly Full </option>
+                      </select>
+                     </div>
+                   </div>
+
+                   <div className="card card-primary mt-3">
+                     <div className="card-body">
+                      <h3>Select Duration</h3>
+
+                      <div className="row">
+                        <div className='col-6'>
+                          <label>From date</label>
+                          <input type='date' className="form-control"/>
+                        </div>
+                        <div className='col-6'>
+                          <label>From date</label>
+                          <input type='date' className="form-control"/>
+                        </div>
+                      </div>
+                     
+                     </div>
+                   </div>
+
+                   <div className="card card-primary mt-3">
+                     <div className="card-body">
+                      <h4>legend</h4>
+
+                      <div className="row">
+                        <div className="col-2 bg-red p-2"></div>
+                        <div className="col-4">Full</div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-2 bg-orange p-2"></div>
+                        <div className="col-4">Half Empty</div>
+                      </div>
+
+                      <div className="row">
+                        <div className="col-2 bg-orange p-2"></div>
+                        <div className="col-4">Half Empty</div>
+                      </div>
+
+
+
+                     
+                     
+                     </div>
+                   </div>
+
+                 
 
                 </div>
               </div>
