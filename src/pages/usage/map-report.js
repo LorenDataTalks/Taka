@@ -16,9 +16,9 @@ class MapReportContainer extends Component {
                     google={this.props.google}
                     zoom={14}
                     style={mapStyles}
-                    initialCenter={{ lat: 37.7749, lng: -122.4194 }}
+                    initialCenter={{ lat: -1.3099100330162774, lng: 36.81332409381867 }}
                 >
-                    <Marker position={{ lat: 37.7749, lng: -122.4194 }} />
+                    <Marker position={{ lat: -1.3099100330162774, lng: 36.81332409381867 }} />
                 </Map>
         </LayoutApp>
      
@@ -27,5 +27,5 @@ class MapReportContainer extends Component {
 }
 
 export default GoogleApiWrapper({
-  apiKey: 'YOUR_API_KEY_GOES_HERE'
+  apiKey: 'AIzaSyDWSzH6aeauzcooBSACFxw_PjsBNMHIzLY'
 })(MapReportContainer);

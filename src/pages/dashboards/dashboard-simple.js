@@ -6,11 +6,10 @@ import Chart from "react-apexcharts";
 import { onValue, ref,getDatabase } from "firebase/database";
 import { MainDatabase } from "../../firebase-connectors/closed-loren";
 
-const Bar=({obj,key})=>(
-   
-  <div className="card col-4">
-    <div className="card-body">
-      <h3>{obj.name}</h3>
+const Bar=({obj,name,color,key})=>(
+  <div className={`card col-4 ${color}`}   >
+    <div className="card-body ">
+      <h3>{name}</h3>
       <small>{obj.level}</small>
     </div>
   </div>
@@ -99,7 +98,8 @@ class DashboardSimple extends React.Component{
                 longitude: -0.2938847,
                 latitude: 1.234784
               }}
-            ]
+            ],
+            quantities:[]
           };
 
 
@@ -118,15 +118,29 @@ class DashboardSimple extends React.Component{
         
           const data = snapshot.val();
 
-          let gadgets=[];
+          let gadgets=new Object();
 
-          
+          let quantities=new Object();
+
+          let historical=new Object();
+
 
           Object.values(data).map((instance,key) => {
-            console.log(""+key,instance);
-            gadgets.push({...instance.end_device_ids,})
+            //console.log(""+instance.end_device_ids.device_id ,instance.end_device_ids.device_id !=="bin-monitor-1");
+
+            gadgets[instance.end_device_ids.device_id]={...instance.end_device_ids};
+
+            if(instance.end_device_ids.device_id !=="bin-monitor-1" && instance.end_device_ids.device_id !=="om-demo-2" )
+                quantities[instance.end_device_ids.device_id]={level:instance.uplink_message.decoded_payload.bin_level}
+
+
+
+            this.setState({...this.state,quantities:quantities})
+            //gadgets.push({...instance.end_device_ids,})
             
           });
+
+          console.log(quantities)
 
         });
     }
@@ -136,9 +150,31 @@ class DashboardSimple extends React.Component{
       
       const bars = [];
 
-      for (let i = 0; i < this.state.bins.length; i++) {
-        bars.push(<Bar obj={this.state.bins[i]}/>);
-      }
+      Object.values(this.state.quantities).map( (bin,key)=>{
+
+          let name=Object.keys(this.state.quantities)[key].split("-").join(" ");
+
+         name= name.replace(
+              /\w\S*/g,
+              function(txt) {
+                  return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+              }
+          );
+
+         let color='bg-info';
+
+          if(bin.level > 23)
+             color='bg-success'
+          if(bin.level <= 22)
+              color='bg-secondary'
+          if(bin.level <=2)
+              color='bg-danger'
+
+
+
+          bars.push(<Bar obj={bin} name={name} color={color} />);
+      })
+
 
         return(
             <LayoutApp>
@@ -226,18 +262,18 @@ class DashboardSimple extends React.Component{
                       <h4>legend</h4>
 
                       <div className="row">
-                        <div className="col-2 bg-red p-2"></div>
+                        <div className="col-2 bg-danger p-2"></div>
                         <div className="col-4">Full</div>
                       </div>
 
-                      <div className="row">
-                        <div className="col-2 bg-orange p-2"></div>
+                      <div className="row mt-2">
+                        <div className="col-2 bg-secondary p-2"></div>
                         <div className="col-4">Half Empty</div>
                       </div>
 
-                      <div className="row">
-                        <div className="col-2 bg-orange p-2"></div>
-                        <div className="col-4">Half Empty</div>
+                      <div className="row mt-2">
+                        <div className="col-2 bg-success p-2"></div>
+                        <div className="col-4"> Empty</div>
                       </div>
 
 
