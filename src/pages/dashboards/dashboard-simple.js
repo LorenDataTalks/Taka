@@ -4,7 +4,7 @@ import LayoutApp from "../../components/layout-app";
 import Chart from "react-apexcharts";
 
 import { onValue, ref,getDatabase } from "firebase/database";
-import { MainDatabase } from "../../firebase-connectors/closed-loren";
+import { MainDatabase,MainFireStore } from "../../firebase-connectors/closed-loren";
 
 const Bar=({obj,name,color,key})=>(
   <div className={`my-1 mx-0 col-4 ${color}`}   >

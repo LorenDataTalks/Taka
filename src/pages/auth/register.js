@@ -1,8 +1,7 @@
 
-import React from "react";
+import React,{Fragment} from "react";
 import { useState } from "react";
 import { getFirestore, addDoc, collection, getDocs, where } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
 import { onValue, ref as sRef,getDatabase, query } from "firebase/database";
 import { MainDatabase,MainFireStore } from "../../firebase-connectors/closed-loren";
 import { Navigate } from "react-router-dom";
@@ -88,7 +87,8 @@ function RegisterPage(){
    const clearForm=()=>{setName('');setLastName('');setCompany('');setPassword('');setEmail('');}
    
     return(
-      <section>         
+      <Fragment>
+         <section>         
           <div className="container-fluid p-0"> 
             <div className="row m-0">
               <div className="col-12 p-0">    
@@ -143,6 +143,8 @@ function RegisterPage(){
             </div>
           </div>
       </section>
+      </Fragment>
+     
     )
 }
 

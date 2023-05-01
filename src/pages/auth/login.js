@@ -27,6 +27,7 @@ export default class LoginPage extends React.Component{
         window.location.href="/home"
        
     }
+    
     updateInputValue(e){
         let item=[]
 
