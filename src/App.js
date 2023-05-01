@@ -8,6 +8,7 @@ import DashboardSimple from "./pages/dashboards/dashboard-simple";
 import RegisterPage from './pages/auth/register';
 import CustomerPage from './pages/customers';
 import MapReport from './pages/usage/map-report';
+import { Bins } from './pages/usage/bin';
 
 class App extends Component{
 
@@ -54,6 +55,8 @@ class App extends Component{
                 <Route path="/customers" element={<CustomerPage/>}/>
 
                 <Route path='/map-report' element={<MapReport/>}></Route>
+
+                <Route path='/bins' element={<Bins/>}/>
             </Routes>
         );
   }

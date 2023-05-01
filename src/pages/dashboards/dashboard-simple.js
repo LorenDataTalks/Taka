@@ -7,10 +7,10 @@ import { onValue, ref,getDatabase } from "firebase/database";
 import { MainDatabase } from "../../firebase-connectors/closed-loren";
 
 const Bar=({obj,name,color,key})=>(
-  <div className={`card col-4 ${color}`}   >
+  <div className={`my-1 mx-0 col-4 ${color}`}   >
     <div className="card-body ">
-      <h3>{name}</h3>
-      <small>{obj.level}</small>
+      <h3 className="text-center px-0 py-0">{name}</h3>
+      <div className="font-center text-center ">{obj.level}</div>
     </div>
   </div>
 )
@@ -21,70 +21,7 @@ class DashboardSimple extends React.Component{
     constructor(props){
         super(props);
 
-
-        let chart1={
-          options: {
-            chart: {
-              id: "basic-bar",
-              height: 350,
-            },
-            xaxis: {
-              categories: ["2023-03-10", "2023-03-11", "2023-03-12", "2023-03-14", "2023-03-15", "2023-03-16", "2023-03-17", "2023-03-18", "2023-03-19"]
-            },
-            title: {
-              text: 'Daily Bin records',
-              align: 'left'
-            },
-          },
-          series: [
-            {
-              name: "bin-1",
-              data: [30, 40, 45, 50, 49, 60, 70, 91]
-            },
-            {
-              name: "bin-2",
-              data: [30, 50, 55, 10, 39, 19, 30, 41]
-            },
-            {
-              name: "bin-3",
-              data: [20, 80, 10, 15, 56, 77, 90, 61]
-            }
-          ],
-        }
         this.state = {
-            chart1:chart1,
-            options2: {
-              chart: {
-                id: "basic-bar",
-                height: 350,
-              },
-              xaxis: {
-                categories: ["2023-03-10", "2023-03-11", "2023-03-12", "2023-03-14", "2023-03-15", "2023-03-16", "2023-03-17", "2023-03-18", "2023-03-19"]
-              },
-              title: {
-                text: 'Product Trends by Month',
-                align: 'left'
-              },
-            },
-            options3: {
-              chart: {
-                id: "basic-bar",
-                height: 350,
-              },
-              xaxis: {
-                categories: ["2023-03-10", "2023-03-11", "2023-03-12", "2023-03-14", "2023-03-15", "2023-03-16", "2023-03-17", "2023-03-18", "2023-03-19"]
-              },
-              title: {
-                text: 'Product Trends by Month',
-                align: 'left'
-              },
-            },
-            series: [
-              {
-                name: "series-1",
-                data: [30, 40, 45, 50, 49, 60, 70, 91]
-              }
-            ],
             bins:[
               {name:"Number of Bins", level: 3,location:{
                 longitude: -0.2938847,
@@ -99,12 +36,53 @@ class DashboardSimple extends React.Component{
                 latitude: 1.234784
               }}
             ],
-            quantities:[]
+            quantities:[],
+            chart1:this.chartStructure(),
           };
-
-
-          
-
+    }
+    chartStructure(){
+       return {
+        series: [{
+          data: [44, 55, 41, 64, 22, 43, 21]
+        }, {
+          data: [53, 32, 33, 52, 13, 44, 32]
+        }],
+        options: {
+          chart: {
+            type: 'bar',
+            height: 430
+          },
+          plotOptions: {
+            bar: {
+              horizontal: true,
+              dataLabels: {
+                position: 'top',
+              },
+            }
+          },
+          dataLabels: {
+            enabled: true,
+            offsetX: -6,
+            style: {
+              fontSize: '12px',
+              colors: ['#fff']
+            }
+          },
+          stroke: {
+            show: true,
+            width: 1,
+            colors: ['#fff']
+          },
+          tooltip: {
+            shared: true,
+            intersect: false
+          },
+          xaxis: {
+            categories: [],
+          },
+        },
+      
+      }
     }
 
     componentDidMount(){
@@ -124,24 +102,60 @@ class DashboardSimple extends React.Component{
 
           let historical=new Object();
 
+          console.log(data);
+
+          let items={"smart-bin-1":[],"smart-bin-2":[],"smart-bin-3":[]}
 
           Object.values(data).map((instance,key) => {
-            //console.log(""+instance.end_device_ids.device_id ,instance.end_device_ids.device_id !=="bin-monitor-1");
+           
+            let date= instance.received_at.split("T")[0]
 
+            if(instance.end_device_ids.device_id !=="bin-monitor-1" && instance.end_device_ids.device_id !=="om-demo-2" ){
+             
+              if(historical[date]==undefined){
+               
+                historical[date]={'smart-bin-1':[],'smart-bin-2':[],'smart-bin-3':[]}
+              
+              }else{
+                
+                historical[date][instance.end_device_ids.device_id]
+                .push(instance.uplink_message.decoded_payload.bin_level  || instance.uplink_message.decoded_payload.bin_level )
+  
+              }
+            }
+            
+            if(instance.end_device_ids.device_id !=="bin-monitor-1" && instance.end_device_ids.device_id !=="om-demo-2" ){
+              if(items[instance.end_device_ids.device_id] ==undefined){
+                items[instance.end_device_ids.device_id]=[]
+              }else{
+                items[instance.end_device_ids.device_id].push({date:instance.received_at,quantity:instance.uplink_message.decoded_payload.bin_level  || instance.uplink_message.decoded_payload.bin_level })
+              }
+            }
+            
             gadgets[instance.end_device_ids.device_id]={...instance.end_device_ids};
 
             if(instance.end_device_ids.device_id !=="bin-monitor-1" && instance.end_device_ids.device_id !=="om-demo-2" )
                 quantities[instance.end_device_ids.device_id]={level:instance.uplink_message.decoded_payload.bin_level}
 
+            let chart1=this.state.chart1
 
+            chart1.options.xaxis.categories=Object.keys(historical)
 
-            this.setState({...this.state,quantities:quantities})
-            //gadgets.push({...instance.end_device_ids,})
-            
+            this.setState({...this.state,quantities:quantities,chart1:chart1})
           });
 
-          console.log(quantities)
+          Object.keys(historical).forEach(element=>{
+            console.log(element,Object.keys(historical[element]))
 
+         //   items['smart-bin-1'].push(historical['element'].smart-bin-1)
+
+
+          });
+
+          
+         
+
+        
         });
     }
 
@@ -163,11 +177,11 @@ class DashboardSimple extends React.Component{
 
          let color='bg-info';
 
-          if(bin.level > 23)
+          if(bin.level > 26)
              color='bg-success'
-          if(bin.level <= 22)
-              color='bg-secondary'
-          if(bin.level <=2)
+          if(bin.level <= 26)
+              color='bg-orange'
+          if(bin.level <=17)
               color='bg-danger'
 
 
@@ -178,59 +192,60 @@ class DashboardSimple extends React.Component{
 
         return(
             <LayoutApp>
-              <h2 className="text-center bg-white ">Taka Smart Bin Analytics</h2>
+              <h2 className="text-center bg-white p-2">Taka Smart Bin Analytics</h2>
 
               <div className="row">
-                <div className="col-8">
-                <div className="row justify-space-between">
+                <div className="col-9">
+                <div className="row justify-space-center mb-3">
                    {bars}
                 </div>
 
               
 
               <div className="row">
-                <div className="card col-6 mx-1">
+                <div className="card col-lg-6 col-md-12 ">
 
                     <div className="mixed-chart">
-                          <Chart
+                      <Chart options={this.state.chart1.options} series={this.state.chart1.series} type="bar" height={430}/>
+                          {/* <Chart
                           options={this.state.chart1.options}
                           series={this.state.chart1.series}
                           type="line"
-                          
-                          />
+                          height={'500'}
+                          /> */}
                       </div>
                 </div>
 
-                <div className="card col-6 mx-1">
+                <div className="card col-lg-6 col-md-12 ">
 
                   <div className="mixed-chart">
-                        <Chart
+                        {/* <Chart
                         options={this.state.options2}
                         series={this.state.series}
-                        type="bar" />
+                        type="bar" /> */}
                     </div>
                 </div>
 
-                <div className="card col-6 mx-1">
+                <div className="card col-lg-5 col-md-12 mx-1">
 
                   <div className="mixed-chart">
-                        <Chart
+                        {/* <Chart
                         options={this.state.options3}
                         series={this.state.series}
                         type="bar"
                         title="Bin By count"
-                        
-                        />
+                        height={'200px'}
+                        /> */}
                     </div>
                 </div>
               </div>
 
                 </div>
-                <div className="col-4">
+                <div className="col-3">
 
-                   <div className="card card-primary mb-1">
+                   <div className="card  card-primary mb-1">
                      <div className="card-body">
-                      <h3>Select bin status</h3>
+                      <h6>Select bin status</h6>
                       <select className='form-control'>
                         <option value='1'>Full </option>
                         <option value='2'>Empty </option>
@@ -239,9 +254,9 @@ class DashboardSimple extends React.Component{
                      </div>
                    </div>
 
-                   <div className="card card-primary mt-3">
+                   <div className="card  card-primary mt-3">
                      <div className="card-body">
-                      <h3>Select Duration</h3>
+                      <h6>Select Duration</h6>
 
                       <div className="row">
                         <div className='col-6'>
@@ -249,7 +264,7 @@ class DashboardSimple extends React.Component{
                           <input type='date' className="form-control"/>
                         </div>
                         <div className='col-6'>
-                          <label>From date</label>
+                          <label>To date</label>
                           <input type='date' className="form-control"/>
                         </div>
                       </div>
@@ -259,27 +274,32 @@ class DashboardSimple extends React.Component{
 
                    <div className="card card-primary mt-3">
                      <div className="card-body">
-                      <h4>legend</h4>
+                      <h6>Legend</h6>
 
-                      <div className="row">
+                      <div className="row px-3" >
                         <div className="col-2 bg-danger p-2"></div>
                         <div className="col-4">Full</div>
                       </div>
 
-                      <div className="row mt-2">
-                        <div className="col-2 bg-secondary p-2"></div>
-                        <div className="col-4">Half Empty</div>
+                      <div className="row px-3 mt-2">
+                        <div className="col-2 bg-orange p-2"></div>
+                        <div className="col-7">Half Empty</div>
                       </div>
 
-                      <div className="row mt-2">
+                      <div className="row px-3 mt-2">
                         <div className="col-2 bg-success p-2"></div>
                         <div className="col-4"> Empty</div>
                       </div>
+                     </div>
+                   </div>
 
-
-
-                     
-                     
+                   <div className="card card-primary mt-3">
+                     <div className="card-body">
+                      <h6>Select location</h6>
+                      <select className='form-control'>
+                       
+                       <option value='1'>Strathmore</option>
+                      </select>
                      </div>
                    </div>
 

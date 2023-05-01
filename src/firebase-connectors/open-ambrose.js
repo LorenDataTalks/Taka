@@ -7,16 +7,18 @@ import { onValue, ref,getDatabase } from "firebase/database";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCghaVlLJzaD_y4g3LQQR_LfJ1JmLJYE14",
-  authDomain: "bin-monitor-cac30.firebaseapp.com",
-  projectId: "bin-monitor-cac30",
-  storageBucket: "bin-monitor-cac30.appspot.com",
-  messagingSenderId: "644573942040",
-  appId: "1:644573942040:web:1f2e39074d926f24630e6d",
-  measurementId: "G-E3JJ29WD0G"
-};
+// const firebaseConfig = {
+//   apiKey: "AIzaSyCghaVlLJzaD_y4g3LQQR_LfJ1JmLJYE14",
+//   authDomain: "bin-monitor-cac30.firebaseapp.com",
+//   projectId: "bin-monitor-cac30",
+//   storageBucket: "bin-monitor-cac30.appspot.com",
+//   messagingSenderId: "644573942040",
+//   appId: "1:644573942040:web:1f2e39074d926f24630e6d",
+//   measurementId: "G-E3JJ29WD0G"
+// };
+
+// export const AuthDatabase=firebaseConfig;
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const AuthDatabase = getDatabase(app);
+// const app = initializeApp(firebaseConfig);
+// export const AuthDatabase = getDatabase(app);

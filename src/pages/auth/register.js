@@ -1,58 +1,147 @@
 
 import React from "react";
-
+import { useState } from "react";
+import { getFirestore, addDoc, collection, getDocs, where } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { onValue, ref as sRef,getDatabase, query } from "firebase/database";
+import { MainDatabase,MainFireStore } from "../../firebase-connectors/closed-loren";
+import { Navigate } from "react-router-dom";
+import { GetTimeStamp } from "../../services/date.service";
 
 function RegisterPage(){
 
+  const db=MainFireStore;
+
+  const [name,setName]=useState("");
+
+  const [lastname,setLastName]=useState('');
+
+  const [company,setCompany]=useState('');
+
+  const [password,setPassword]=useState('');
+
+  const [email,setEmail]=useState('');
+
+  const [users,setUsers]=useState([]);
+ 
+  const q=query(collection(db,"users"));
+
+  getDocs(q).then(response=>{
+   
+    setUsers(response.docs);
+
+    response.docs.forEach(user=>{
+     // console.log("doc-response",user._document.data.value.mapValue.fields)
+    })
+  })
+
+  const handleFormSubmission=(event)=>{
+   
+    event.preventDefault();
+
+    //todo :check if the email already exits in the database
+
+    let isAvailable=false;
+    
+    if(users.length > 0){
+
+      users.forEach(user=>{
+        if(user._document.data.value.mapValue.fields.email.stringValue==email){
+          isAvailable=true;
+        }
+      })
+
+    }
+
+    if(isAvailable){
+      alert("Email already exists in our system")
+      console.log("duplicate emails not allowed")
+      return ;
+    }
+
+    return ;
+   
+
+    addDoc(collection(db,"company"),{name:company,created_on:GetTimeStamp()}).then(response=>{
+
+      let company_id=response.id;
+
+      addDoc(collection(db,"users"),{firstname:name,lastname:lastname,company:company_id,password,email}).then(response=>{
+       
+        console.log("created-users-id",response.id);
+        
+       // clearForm();
+        
+      //  Navigate('/login');
+      
+      }).catch(error=>{
+       
+        console.log("error-addoc",error)
+
+        alert("Error connecting to the server , please retry again later");
+     
+      });
+    });
+
+   }
+
+   const clearForm=()=>{setName('');setLastName('');setCompany('');setPassword('');setEmail('');}
+   
     return(
-        <section>         
-        <div class="container-fluid p-0"> 
-          <div class="row m-0">
-            <div class="col-12 p-0">    
-              <div class="login-card">
-                <form class="theme-form login-form">
-                  <h4>Create your account</h4>
-                  <h6>Enter your personal details to create account</h6>
-                  <div class="form-group">
-                    <label>Your Name</label>
-                    <div class="small-group">
-                      <div class="input-group"><span class="input-group-text"><i class="icon-user"></i></span>
-                        <input class="form-control" type="text" required="" placeholder="Fist Name"/>
+      <section>         
+          <div className="container-fluid p-0"> 
+            <div className="row m-0">
+              <div className="col-12 p-0">    
+                <div className="login-card">
+                  <form className="theme-form login-form" onSubmit={handleFormSubmission}>
+                    <h4>Create your account</h4>
+                    <h6>Enter your personal details to create account</h6>
+                    <div className="form-group">
+                      <label>Your Name</label>
+                      <div className="small-group">
+                        <div className="input-group"><span className="input-group-text"><i className="icon-user"></i></span>
+                          <input className="form-control" type="text" value={name} onChange={(e)=>setName(e.target.value)} required placeholder="Fist Name"/>
+                        </div>
+                        <div className="input-group"><span className="input-group-text"><i className="icon-user"></i></span>
+                          <input className="form-control" type="text" value={lastname} onChange={(e)=>setLastName(e.target.value)} required placeholder="Last Name"/>
+                        </div>
                       </div>
-                      <div class="input-group"><span class="input-group-text"><i class="icon-user"></i></span>
-                        <input class="form-control" type="email" required="" placeholder="Last Name"/>
+                    </div>
+                    <div className="form-group">
+                      <label>Email Address</label>
+                      <div className="input-group"><span className="input-group-text"><i className="icon-email"></i></span>
+                        <input className="form-control" type="text" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="Test@gmail.com"/>
                       </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label>Email Address</label>
-                    <div class="input-group"><span class="input-group-text"><i class="icon-email"></i></span>
-                      <input class="form-control" type="email" required="" placeholder="Test@gmail.com"/>
+                    <div className="form-group">
+                      <label>Company name</label>
+                      <div className="input-group"><span className="input-group-text"><i className="icon-email"></i></span>
+                        <input className="form-control" type="text" value={company} onChange={(e)=>setCompany(e.target.value)} placeholder="compa"/>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label>Password</label>
-                    <div class="input-group"><span class="input-group-text"><i class="icon-lock"></i></span>
-                      <input class="form-control" type="password" name="login[password]" required="" placeholder="*********"/>
-                      <div class="show-hide"><span class="show">                         </span></div>
+                    <div className="form-group">
+                      <label>Password</label>
+                      <div className="input-group"><span className="input-group-text"><i className="icon-lock"></i></span>
+                        <input className="form-control" type="password" value={password} onChange={(e)=>setPassword(e.target.value)} name="login[password]" required="" placeholder="*********"/>
+                        <div className="show-hide"><span className="show">                         </span></div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="checkbox">
-                      <input id="checkbox1" type="checkbox"/>
-                      <label class="text-muted" for="checkbox1">Agree with <span>Privacy Policy                   </span></label>
+                    <div className="form-group">
+                      <div className="checkbox">
+                        <input id="checkbox1" type="checkbox"/>
+                        <label className="text-muted" htmlFor="checkbox1">Agree with <span>Privacy Policy                   </span></label>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <button class="btn btn-primary btn-block" type="submit">Create Account</button>
-                  </div>
-                  
-                  <p>Already have an account?<a class="ms-2" href="/login">Sign in</a></p>
-                </form>
+                    <div className="form-group">
+                      <button className="btn btn-primary btn-block" type="submit">Create Account</button>
+                    </div>
+                    
+                    <p>Already have an account?<a className="ms-2" href="/login">Sign in</a></p>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
-        </div>
       </section>
     )
 }
