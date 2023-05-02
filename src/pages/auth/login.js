@@ -1,7 +1,9 @@
 import React from "react";
 import {Helmet} from "react-helmet";
 import { GetToken } from "../../services/token.service";
-import { Redirect } from "react-router-dom";
+import { MainFireStore } from "../../firebase-connectors/closed-loren";
+import { collection, getDocs, query } from "firebase/firestore";
+import { extract_firebase_object } from "../../services/data.service";
 
 export default class LoginPage extends React.Component{
 
@@ -20,11 +22,33 @@ export default class LoginPage extends React.Component{
 
         e.preventDefault()
 
-       this.props.setToken(this.state.current_password)
+        const db=MainFireStore;
 
-       this.setState({...this.state,token:GetToken() !==undefined && GetToken() !=null})
+        const q=query(collection(db,"users"));
+        
+        getDocs(q).then(response=>{
 
-        window.location.href="/home"
+            let users=extract_firebase_object(response.docs)
+
+            users.forEach(user=>{
+               
+                if(this.state.username === user.email && this.state.current_password ==user.password){
+                   
+                    this.props.setToken(user.email)
+
+                    this.setState({...this.state,token:GetToken() !==undefined && GetToken() !=null})
+
+                    window.location.href="/home"
+                }
+
+            });
+        });
+
+       //this.props.setToken(this.state.current_password)
+
+       //this.setState({...this.state,token:GetToken() !==undefined && GetToken() !=null})
+
+       // window.location.href="/home"
        
     }
     
@@ -57,7 +81,7 @@ export default class LoginPage extends React.Component{
                                             <label>Email Address</label>
                                             <div className="input-group"><span className="input-group-text"><i
                                                 className="icon-email"></i></span>
-                                                <input className="form-control" type="email" required="" name='username' onKeyUp={this.updateInputValue.bind(this)}
+                                                <input className="form-control" type="email" required name='username' onKeyUp={this.updateInputValue.bind(this)}
                                                        placeholder="Test@gmail.com"/>
                                             </div>
                                         </div>
@@ -66,7 +90,7 @@ export default class LoginPage extends React.Component{
                                             <div className="input-group"><span className="input-group-text">
                                                 <i className="fa fa-key"></i></span>
                                                 <input className="form-control" type="password" name="current_password"
-                                                       required="" placeholder="*********" onKeyUp={this.updateInputValue.bind(this)}/>
+                                                       required placeholder="*********" onKeyUp={this.updateInputValue.bind(this)}/>
                                                     <div className="show-hide"><span
                                                         className="show">                         </span></div>
                                             </div>

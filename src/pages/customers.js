@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-import { MainDatabase,MainFireStore } from "../firebase-connectors/closed-loren";
-import { useEffect } from 'react';
+import { MainFireStore } from "../firebase-connectors/closed-loren";
 import LayoutApp from "../components/layout-app";
-import { getFirestore, addDoc, collection, getDocs, where } from "firebase/firestore";
-import { onValue, ref,getDatabase, query } from "firebase/database";
+import { collection, getDocs } from "firebase/firestore";
+import { query } from "firebase/database";
+import { extract_firebase_object } from "../services/data.service";
 
 export default function CustomerPage(){
 
@@ -16,11 +16,11 @@ export default function CustomerPage(){
 
     getDocs(q).then(response=>{
 
-        setCompanys(response.docs)
+        let companys=extract_firebase_object(response.docs);
 
-        response.docs.forEach(company=>{
-            console.log("doc-response",company._document.data.value.mapValue.fields)
-        })
+        console.log("getDocs",companys)
+
+        setCompanys(companys)
 
     })
 
@@ -29,19 +29,24 @@ export default function CustomerPage(){
 
             <div className="row">
 
-                {companys.map( (company)=>(
-                    <div className="col-xl-4 col-lg-6 col-md-6">
+            <div className="card">
+                <div className="card-header">
+                    <h5>Company Management</h5><span></span>
+                </div>
+
+            </div>
+
+                {companys.map( (company,key)=>(
+                    <div key={key} className="col-xl-4 col-lg-6 col-md-6">
                     <div className="card">
                     <div className="card-header">
                         <div className="d-flex align-items-start">
                         <div className="d-flex align-items-start">
-                            <div className="avatar me-3">
-                            <i className="rounded-circle" alt="Avatar"/>
-                            </div>
+                           
                             <div className="me-2">
-                            <h5 className="mb-1"><a href="javascript:;" className="h5 stretched-link">{company.name}</a></h5>
+                            <h5 className="mb-1"><span className="h5 stretched-link">{company.name}</span></h5>
                             <div className="client-info d-flex align-items-center">
-                                <h6 className="mb-0 me-1">Client:</h6><span>Christian Jimenez</span>
+                                <h6 className="mb-0 me-1">Created By:</h6><span>Christian Jimenez</span>
                             </div>
                             </div>
                         </div>
@@ -52,25 +57,24 @@ export default function CustomerPage(){
                     </div>
                     <div className="card-body">
                         <div className="d-flex align-items-center flex-wrap">
-                        <div className="bg-lighter p-2 rounded me-auto mb-3">
-                            <h6 className="mb-1">$24.8k <span className="text-body fw-normal">/ $18.2k</span></h6>
-                            <span>Total Budget</span>
+                        <div className="bg-lighter rounded me-auto mb-3">
+                            <h6 className="mb-1">Latest Collection<span className="text-body fw-normal"></span></h6>
+                            
                         </div>
                         <div className="text-end mb-3">
-                            <h6 className="mb-1">Start Date: <span className="text-body fw-normal">14/2/21</span></h6>
-                            <h6 className="mb-1">Deadline: <span className="text-body fw-normal">28/2/22</span></h6>
+                            <h6 className="mb-1">Latest Activity <span className="text-body fw-normal">{company.created_on}</span></h6>
+                           
                         </div>
                         </div>
                         <p className="mb-0">We are Consulting, Software Development and Web Development Services.</p>
                     </div>
                     <div className="card-body border-top">
                         <div className="d-flex align-items-center mb-3">
-                        <h6 className="mb-1">All Hours: <span className="text-body fw-normal">380/244</span></h6>
+                        <h6 className="mb-1">Total Collections: <span className="text-body fw-normal">380</span></h6>
                         <span className="badge bg-label-success ms-auto">28 Days left</span>
                         </div>
                         <div className="d-flex justify-content-between align-items-center mb-1">
-                        <small>Task: 290/344</small>
-                        <small>95% Completed</small>
+                       
                         </div>
                         <div className="progress mb-3" >
                         <div className="progress-bar" role="progressbar"  aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
@@ -78,20 +82,12 @@ export default function CustomerPage(){
                         <div className="d-flex align-items-center">
                         <div className="d-flex align-items-center">
                             <ul className="list-unstyled d-flex align-items-center avatar-group mb-0 zindex-2">
-                            <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" className="avatar avatar-sm pull-up" aria-label="Vinnie Mostowy" data-bs-original-title="Vinnie Mostowy">
-                                <img className="rounded-circle" src="../../assets/img/avatars/5.png" alt="Avatar"/>
-                            </li>
-                            <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" className="avatar avatar-sm pull-up" aria-label="Allen Rieske" data-bs-original-title="Allen Rieske">
-                                <img className="rounded-circle" src="../../assets/img/avatars/12.png" alt="Avatar"/>
-                            </li>
-                            <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" className="avatar avatar-sm pull-up me-2" aria-label="Julee Rossignol" data-bs-original-title="Julee Rossignol">
-                                <img className="rounded-circle" src="../../assets/img/avatars/6.png" alt="Avatar"/>
-                            </li>
-                            <li><small className="text-muted">8 Users</small></li>
+                
+                            <li><small className="text-muted">3 Users</small></li>
                             </ul>
                         </div>
                         <div className="ms-auto">
-                            <a href="javascript:void(0);" className="text-body"><i className="bx bx-chat"></i> 15</a>
+                            
                         </div>
                         </div>
                     </div>
