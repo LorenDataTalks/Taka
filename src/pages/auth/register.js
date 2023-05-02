@@ -57,8 +57,6 @@ function RegisterPage(){
       console.log("duplicate emails not allowed")
       return ;
     }
-
-    return ;
    
 
     addDoc(collection(db,"company"),{name:company,created_on:GetTimeStamp()}).then(response=>{
