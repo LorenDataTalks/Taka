@@ -6,6 +6,8 @@ export function extract_firebase_object(obj){
 
         let comp=[];
 
+        comp['id']=object.id
+
         Object.keys(object._document.data.value.mapValue.fields).forEach(key=>{
           comp[key]=Object.values(object._document.data.value.mapValue.fields[key])[0]
         })

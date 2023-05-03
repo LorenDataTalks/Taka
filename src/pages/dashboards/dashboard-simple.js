@@ -5,6 +5,7 @@ import Chart from "react-apexcharts";
 
 import { onValue, ref,getDatabase } from "firebase/database";
 import { MainDatabase,MainFireStore } from "../../firebase-connectors/closed-loren";
+import { GetCurrentDate, GetFirstDateOfTheMonth } from "../../services/date.service";
 
 const Bar=({obj,name,color,key})=>(
   <div className={`my-1 mx-0 col-4 ${color}`}   >
@@ -22,63 +23,61 @@ class DashboardSimple extends React.Component{
         super(props);
 
         this.state = {
-            bins:[
-              {name:"Number of Bins", level: 3,location:{
-                longitude: -0.2938847,
-                latitude: 1.234784
-              }},
-              {name:"Smart Monitor 1", level: 80,location:{
-                longitude: -0.2938847,
-                latitude: 1.234784
-              }},
-              {name:"Smart Monitor 2", level: 70,location:{
-                longitude: -0.2938847,
-                latitude: 1.234784
-              }}
-            ],
+          
+            bins:[ ],
             quantities:[],
+            chart:this.chartStructure(),
             chart1:this.chartStructure(),
+            chart2:this.chartStructure(),
+            chart3:this.chartStructure(),
+            from_date:GetFirstDateOfTheMonth(),
+            to_date:GetCurrentDate()
           };
     }
-    chartStructure(){
+    chartStructure(series=[],categories=[],title='',colors=['#d22d3d','#ffa500','#1b4c43']){
        return {
-        series: [{
-          data: [44, 55, 41, 64, 22, 43, 21]
-        }, {
-          data: [53, 32, 33, 52, 13, 44, 32]
-        }],
+        series: series,
         options: {
           chart: {
             type: 'bar',
-            height: 430
+            height: 630,
+            width:400
           },
           plotOptions: {
             bar: {
-              horizontal: true,
+              horizontal: false,
               dataLabels: {
                 position: 'top',
               },
             }
           },
+
+          title: {
+            text: title,
+            align: 'center',
+            floating: true
+          },
+          
+          colors: colors,
           dataLabels: {
             enabled: true,
-            offsetX: -6,
+            offsetX: 0,
             style: {
-              fontSize: '12px',
-              colors: ['#fff']
+              fontSize: '10px',
+              colors: ['#000']
             }
           },
           stroke: {
             show: true,
-            width: 1,
+            width: .1,
             colors: ['#fff']
           },
           tooltip: {
-            shared: true,
+            shared: false,
             intersect: false
           },
           xaxis: {
-            categories: [],
+            categories: categories,
           },
         },
       
@@ -86,7 +85,7 @@ class DashboardSimple extends React.Component{
     }
 
     componentDidMount(){
-      console.log("componentDidMount")
+    
 
       const db=MainDatabase;
 
@@ -102,8 +101,7 @@ class DashboardSimple extends React.Component{
 
           let historical=new Object();
 
-          console.log(data);
-
+        
           let items={"smart-bin-1":[],"smart-bin-2":[],"smart-bin-3":[]}
 
           Object.values(data).map((instance,key) => {
@@ -139,17 +137,57 @@ class DashboardSimple extends React.Component{
 
             let chart1=this.state.chart1
 
+           
             chart1.options.xaxis.categories=Object.keys(historical)
 
-            this.setState({...this.state,quantities:quantities,chart1:chart1})
+           
           });
 
+
+         
+
+          let cleanBin={1:[],2:[],3:[]};
+
+          Object.keys(historical).forEach(key=>{
+            
+            if( parseInt(key.split("-")[0]) >= parseInt(this.state.from_date.split("-")[0]) & parseInt(key.split("-")[1]) >= parseInt(this.state.from_date.split("-")[1])){
+              Object.keys(historical[key]).forEach( (element,keyp)=>{
+
+          
+                let items=historical[key][Object.keys(historical[key])[keyp]];
+  
+                 if(items.length > 1){
+                  cleanBin[keyp+1].push(items[0])
+                }else{
+                  cleanBin[keyp+1].push(0)
+                }
+  
+              })
+            }
+            
+            
+          });
+
+          
+
+          this.setState({...this.state,quantities:quantities,
+            
+            chart:this.chartStructure([{data:cleanBin[1],name:"Smart Bin 1"},{data:cleanBin[2],name:"Smart Bin 2"},{data:cleanBin[3],name:"Smart Bin 3"}],Object.keys(historical),"Comparison For Bin Collection "),
+            chart1:this.chartStructure([{data:cleanBin[1],name:"Smart Bin 1"}],Object.keys(historical),"Smart Bin 1 report",['#d22d3d']),
+            chart2:this.chartStructure([{data:cleanBin[2],name:"Smart Bin 2"}],Object.keys(historical),"Smart Bin 1 report",['#ffa500']),
+            chart3:this.chartStructure([{data:cleanBin[3],name:"Smart Bin 3"}],Object.keys(historical),"Smart Bin 1 report",['#1b4c43']),
+         
+         
+          })
+
+
+          console.log("historical-data",cleanBin.length)
+          console.log("historical-length",Object.keys(historical).length)
+
+
+
           Object.keys(historical).forEach(element=>{
-            console.log(element,Object.keys(historical[element]))
-
-         //   items['smart-bin-1'].push(historical['element'].smart-bin-1)
-
-
+          
           });
 
           
@@ -157,6 +195,16 @@ class DashboardSimple extends React.Component{
 
         
         });
+    }
+
+    handleToDate(e){
+      this.setState({...this.state,to_date:e.target.value})
+    }
+
+    handleFromDate(e){
+      console.log("change",e.target.value)
+
+      this.setState({...this.state,from_date:e.target.value})
     }
 
     render() {
@@ -203,10 +251,10 @@ class DashboardSimple extends React.Component{
               
 
               <div className="row">
-                <div className="card col-lg-6 col-md-12 ">
+                <div className="card col-lg-12 col-md-12 ">
 
                     <div className="mixed-chart">
-                      <Chart options={this.state.chart1.options} series={this.state.chart1.series} type="bar" height={430}/>
+                      <Chart options={this.state.chart.options} series={this.state.chart.series} type="bar" height={630} />
                           {/* <Chart
                           options={this.state.chart1.options}
                           series={this.state.chart1.series}
@@ -219,25 +267,41 @@ class DashboardSimple extends React.Component{
                 <div className="card col-lg-6 col-md-12 ">
 
                   <div className="mixed-chart">
-                        {/* <Chart
-                        options={this.state.options2}
-                        series={this.state.series}
-                        type="bar" /> */}
+                        { <Chart
+                        options={this.state.chart1.options}
+                        series={this.state.chart1.series}
+                        type="bar"
+                        title="Smart Bin Monitor 1"
+                        height={400} /> }
                     </div>
                 </div>
 
                 <div className="card col-lg-5 col-md-12 mx-1">
 
                   <div className="mixed-chart">
-                        {/* <Chart
-                        options={this.state.options3}
-                        series={this.state.series}
+                        {<Chart
+                        options={this.state.chart2.options}
+                        series={this.state.chart2.series}
                         type="bar"
-                        title="Bin By count"
-                        height={'200px'}
-                        /> */}
+                        title="Smart Bin Monitor 2"
+                        height={400}
+                        /> }
                     </div>
                 </div>
+
+                <div className="card col-lg-5 col-md-12 mx-1">
+
+                  <div className="mixed-chart">
+                        {<Chart
+                        options={this.state.chart3.options}
+                        series={this.state.chart3.series}
+                        type="bar"
+                        title="Smart Bin Monitor 3"
+                        height={400}
+                        /> }
+                    </div>
+                </div>
+
               </div>
 
                 </div>
@@ -261,11 +325,11 @@ class DashboardSimple extends React.Component{
                       <div className="row">
                         <div className='col-6'>
                           <label>From date</label>
-                          <input type='date' className="form-control"/>
+                          <input type='date' className="form-control" onChange={this.handleFromDate.bind(this)} value={this.state.from_date}/>
                         </div>
                         <div className='col-6'>
                           <label>To date</label>
-                          <input type='date' className="form-control"/>
+                          <input type='date' className="form-control" onChange={this.handleToDate.bind(this)} value={this.state.to_date}/>
                         </div>
                       </div>
                      

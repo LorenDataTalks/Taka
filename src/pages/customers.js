@@ -18,8 +18,6 @@ export default function CustomerPage(){
 
         let companys=extract_firebase_object(response.docs);
 
-        console.log("getDocs",companys)
-
         setCompanys(companys)
 
     })

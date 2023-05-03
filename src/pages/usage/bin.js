@@ -21,7 +21,7 @@ export function Bins(){
 
     const [bins,setBins]=useState([]);
     
-
+    
 
     useEffect( ()=>{
         const db=MainDatabase;

@@ -1,9 +1,10 @@
 import React from "react";
-import {Helmet} from "react-helmet";
 import { GetToken } from "../../services/token.service";
 import { MainFireStore } from "../../firebase-connectors/closed-loren";
 import { collection, getDocs, query } from "firebase/firestore";
 import { extract_firebase_object } from "../../services/data.service";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default class LoginPage extends React.Component{
 
@@ -28,28 +29,30 @@ export default class LoginPage extends React.Component{
         
         getDocs(q).then(response=>{
 
-            let users=extract_firebase_object(response.docs)
+            let users=extract_firebase_object(response.docs);
+
+            let found=false
 
             users.forEach(user=>{
                
-                if(this.state.username === user.email && this.state.current_password ==user.password){
+                if(this.state.username === user.email && this.state.current_password ===user.password){
                    
                     this.props.setToken(user.email)
 
                     this.setState({...this.state,token:GetToken() !==undefined && GetToken() !=null})
 
-                    window.location.href="/home"
+                    window.location.href="/home";
+
+                    found=true
                 }
 
             });
+
+            if(!found){
+                toast("User not found please contact admin or check users");
+            }
         });
 
-       //this.props.setToken(this.state.current_password)
-
-       //this.setState({...this.state,token:GetToken() !==undefined && GetToken() !=null})
-
-       // window.location.href="/home"
-       
     }
     
     updateInputValue(e){
@@ -63,12 +66,6 @@ export default class LoginPage extends React.Component{
     render() {
         return(
             <>
-                <Helmet>
-
-
-
-                </Helmet>
-
                 <section>
                     <div className="container-fluid p-0">
                         <div className="row">
@@ -105,7 +102,7 @@ export default class LoginPage extends React.Component{
                                         <div className="form-group">
                                             <button className="btn btn-primary btn-block" type="submit">Sign in</button>
                                         </div>
-
+                                        <ToastContainer />
                                         <p>Don't have account?<a className="ms-2" href="/create-account">Create Account</a>
                                         </p>
                                     </form>

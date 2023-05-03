@@ -1,13 +1,16 @@
 
 import React,{Fragment} from "react";
 import { useState } from "react";
-import { getFirestore, addDoc, collection, getDocs, where } from "firebase/firestore";
-import { onValue, ref as sRef,getDatabase, query } from "firebase/database";
-import { MainDatabase,MainFireStore } from "../../firebase-connectors/closed-loren";
-import { Navigate } from "react-router-dom";
+import {  addDoc, collection, getDocs } from "firebase/firestore";
+import {  query } from "firebase/database";
+import { MainFireStore } from "../../firebase-connectors/closed-loren";
 import { GetTimeStamp } from "../../services/date.service";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function RegisterPage(){
+
+ 
 
   const db=MainFireStore;
 
@@ -45,7 +48,7 @@ function RegisterPage(){
     if(users.length > 0){
 
       users.forEach(user=>{
-        if(user._document.data.value.mapValue.fields.email.stringValue==email){
+        if(user._document.data.value.mapValue.fields.email.stringValue===email){
           isAvailable=true;
         }
       })
@@ -53,8 +56,7 @@ function RegisterPage(){
     }
 
     if(isAvailable){
-      alert("Email already exists in our system")
-      console.log("duplicate emails not allowed")
+      toast("Duplicate emails are not allowed");
       return ;
     }
    
@@ -67,16 +69,14 @@ function RegisterPage(){
        
         console.log("created-users-id",response.id);
         
-       // clearForm();
+        clearForm();
         
       //  Navigate('/login');
       
       }).catch(error=>{
-       
-        console.log("error-addoc",error)
-
-        alert("Error connecting to the server , please retry again later");
-     
+        
+        toast("Something broke !");
+      
       });
     });
 
@@ -131,9 +131,10 @@ function RegisterPage(){
                       </div>
                     </div>
                     <div className="form-group">
+                
                       <button className="btn btn-primary btn-block" type="submit">Create Account</button>
                     </div>
-                    
+                    <ToastContainer />
                     <p>Already have an account?<a className="ms-2" href="/login">Sign in</a></p>
                   </form>
                 </div>
