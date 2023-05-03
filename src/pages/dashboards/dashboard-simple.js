@@ -3,8 +3,8 @@ import React from "react";
 import LayoutApp from "../../components/layout-app";
 import Chart from "react-apexcharts";
 
-import { onValue, ref,getDatabase } from "firebase/database";
-import { MainDatabase,MainFireStore } from "../../firebase-connectors/closed-loren";
+import { onValue, ref } from "firebase/database";
+import { MainDatabase } from "../../firebase-connectors/closed-loren";
 import { GetCurrentDate, GetFirstDateOfTheMonth } from "../../services/date.service";
 
 const Bar=({obj,name,color,key})=>(
@@ -95,22 +95,22 @@ class DashboardSimple extends React.Component{
         
           const data = snapshot.val();
 
-          let gadgets=new Object();
+          let gadgets={};
 
-          let quantities=new Object();
+          let quantities={};
 
-          let historical=new Object();
+          let historical={};
 
         
           let items={"smart-bin-1":[],"smart-bin-2":[],"smart-bin-3":[]}
 
-          Object.values(data).map((instance,key) => {
+          Object.values(data).forEach((instance,key) => {
            
             let date= instance.received_at.split("T")[0]
 
             if(instance.end_device_ids.device_id !=="bin-monitor-1" && instance.end_device_ids.device_id !=="om-demo-2" ){
              
-              if(historical[date]==undefined){
+              if(historical[date]===undefined){
                
                 historical[date]={'smart-bin-1':[],'smart-bin-2':[],'smart-bin-3':[]}
               
@@ -123,7 +123,7 @@ class DashboardSimple extends React.Component{
             }
             
             if(instance.end_device_ids.device_id !=="bin-monitor-1" && instance.end_device_ids.device_id !=="om-demo-2" ){
-              if(items[instance.end_device_ids.device_id] ==undefined){
+              if(items[instance.end_device_ids.device_id] ===undefined){
                 items[instance.end_device_ids.device_id]=[]
               }else{
                 items[instance.end_device_ids.device_id].push({date:instance.received_at,quantity:instance.uplink_message.decoded_payload.bin_level  || instance.uplink_message.decoded_payload.bin_level })
@@ -151,7 +151,7 @@ class DashboardSimple extends React.Component{
           Object.keys(historical).forEach(key=>{
             
             if( parseInt(key.split("-")[0]) >= parseInt(this.state.from_date.split("-")[0]) & parseInt(key.split("-")[1]) >= parseInt(this.state.from_date.split("-")[1])){
-              Object.keys(historical[key]).forEach( (element,keyp)=>{
+              Object.keys(historical[key]).forEach( (_,keyp)=>{
 
           
                 let items=historical[key][Object.keys(historical[key])[keyp]];
@@ -173,25 +173,15 @@ class DashboardSimple extends React.Component{
           this.setState({...this.state,quantities:quantities,
             
             chart:this.chartStructure([{data:cleanBin[1],name:"Smart Bin 1"},{data:cleanBin[2],name:"Smart Bin 2"},{data:cleanBin[3],name:"Smart Bin 3"}],Object.keys(historical),"Comparison For Bin Collection "),
+            
             chart1:this.chartStructure([{data:cleanBin[1],name:"Smart Bin 1"}],Object.keys(historical),"Smart Bin 1 report",['#d22d3d']),
+            
             chart2:this.chartStructure([{data:cleanBin[2],name:"Smart Bin 2"}],Object.keys(historical),"Smart Bin 1 report",['#ffa500']),
+            
             chart3:this.chartStructure([{data:cleanBin[3],name:"Smart Bin 3"}],Object.keys(historical),"Smart Bin 1 report",['#1b4c43']),
          
          
-          })
-
-
-          console.log("historical-data",cleanBin.length)
-          console.log("historical-length",Object.keys(historical).length)
-
-
-
-          Object.keys(historical).forEach(element=>{
-          
           });
-
-          
-         
 
         
         });
@@ -202,8 +192,6 @@ class DashboardSimple extends React.Component{
     }
 
     handleFromDate(e){
-      console.log("change",e.target.value)
-
       this.setState({...this.state,from_date:e.target.value})
     }
 
@@ -212,7 +200,7 @@ class DashboardSimple extends React.Component{
       
       const bars = [];
 
-      Object.values(this.state.quantities).map( (bin,key)=>{
+      Object.values(this.state.quantities).forEach( (bin,key)=>{
 
           let name=Object.keys(this.state.quantities)[key].split("-").join(" ");
 

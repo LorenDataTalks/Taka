@@ -9,6 +9,7 @@ import RegisterPage from './pages/auth/register';
 import CustomerPage from './pages/customers';
 import MapReport from './pages/usage/map-report';
 import { Bins } from './pages/usage/bin';
+import UserManagement from './pages/usage/users';
 
 class App extends Component{
 
@@ -57,6 +58,8 @@ class App extends Component{
                 <Route path='/map-report' element={<MapReport/>}></Route>
 
                 <Route path='/bins' element={<Bins/>}/>
+
+                <Route path='/users' element={<UserManagement/>}/>
             </Routes>
         );
   }

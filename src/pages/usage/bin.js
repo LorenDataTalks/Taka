@@ -1,27 +1,16 @@
 import React, { useEffect,Fragment } from "react";
 import LayoutApp from "../../components/layout-app";
 import { useState } from "react";
-import { getFirestore, addDoc, collection, getDocs, where } from "firebase/firestore";
-import { onValue, ref as sRef,getDatabase, query, ref } from "firebase/database";
-import { MainDatabase,MainFireStore } from "../../firebase-connectors/closed-loren";
+import { onValue, ref } from "firebase/database";
+import { MainDatabase } from "../../firebase-connectors/closed-loren";
 
 
-const BinTable=({bin})=>(
-    <tr>
-        <td scope="row">1</td>
-        <td>Alexander</td>
-        <td>Orton</td>
-        <td>@mdorton</td>
-        <td>Admin</td>
-        <td>USA</td>
-    </tr> 
-)
 
 export function Bins(){
 
     const [bins,setBins]=useState([]);
     
-    
+
 
     useEffect( ()=>{
         const db=MainDatabase;
@@ -34,7 +23,7 @@ export function Bins(){
 
             let items=[];
             
-            Object.values(data).map((instance,key) => {
+            Object.values(data).forEach((instance,key) => {
 
               let level=0;
 
@@ -78,8 +67,8 @@ export function Bins(){
                         </tr>
                     </thead>
                     <tbody>
-                       {bins.map( (bin,key)=>( <tr>
-                                            <td scope="row">{key+1}</td>
+                       {bins.map( (bin,key)=>( <tr key={key}>
+                                            <td >{key+1}</td>
                                             <td>{bin.device_id}</td>
                                             <td>Active</td>
                                     

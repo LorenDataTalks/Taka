@@ -13,7 +13,8 @@ export default class SidebarApp extends Component{
         this.state={
             name:'',
             companyId:'',
-            companyName:''
+            companyName:'',
+            role:2
         }
 
         
@@ -33,7 +34,7 @@ export default class SidebarApp extends Component{
             users.forEach(user=>{
 
                 if(user.email===email){
-                    this.setState({...this.state,name:user.firstname+' '+user.lastname,companyId:user.company})
+                    this.setState({...this.state,name:user.firstname+' '+user.lastname,companyId:user.company,role:user.level})
                 }     
             });
 
@@ -102,6 +103,7 @@ export default class SidebarApp extends Component{
                                     </ul>
                                 </li>
 
+                                {this.state.role == 3? 
                                
                                 <li className="dropdown"><a className="nav-link menu-title"
                                                             href="/customers"><i
@@ -110,7 +112,18 @@ export default class SidebarApp extends Component{
                                         <li><a href="index.html">Default</a></li>
                                         <li><a href="dashboard-02.html">Ecommerce</a></li>
                                     </ul>
-                                </li>
+                                </li>  : ''}
+
+                                {this.state.role ==1  || this.state.role == 3? 
+
+                                <li className="dropdown"><a className="nav-link menu-title"
+                                                            href="/users"><i
+                                    data-feather="home"></i><span>User Management</span></a>
+                                    <ul className="nav-submenu menu-content">
+                                        <li><a href="index.html">Default</a></li>
+                                        <li><a href="dashboard-02.html">Ecommerce</a></li>
+                                    </ul>
+                                </li>  : ''}
 
                             </ul>
                         </div>
