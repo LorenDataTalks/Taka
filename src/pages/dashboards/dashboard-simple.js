@@ -115,9 +115,13 @@ class DashboardSimple extends React.Component{
                 historical[date]={'smart-bin-1':[],'smart-bin-2':[],'smart-bin-3':[]}
               
               }else{
-                
-                historical[date][instance.end_device_ids.device_id]
+
+                if(instance.uplink_message.decoded_payload !=undefined){
+                  historical[date][instance.end_device_ids.device_id]
                 .push(instance.uplink_message.decoded_payload.bin_level  || instance.uplink_message.decoded_payload.bin_level )
+                }
+                
+                
   
               }
             }
@@ -126,14 +130,23 @@ class DashboardSimple extends React.Component{
               if(items[instance.end_device_ids.device_id] ===undefined){
                 items[instance.end_device_ids.device_id]=[]
               }else{
-                items[instance.end_device_ids.device_id].push({date:instance.received_at,quantity:instance.uplink_message.decoded_payload.bin_level  || instance.uplink_message.decoded_payload.bin_level })
-              }
+
+                if(instance.uplink_message.decoded_payload !=undefined){
+                  items[instance.end_device_ids.device_id].push({date:instance.received_at,quantity:instance.uplink_message.decoded_payload.bin_level  || instance.uplink_message.decoded_payload.bin_level })
+           
+                }
+                 }
             }
             
             gadgets[instance.end_device_ids.device_id]={...instance.end_device_ids};
 
-            if(instance.end_device_ids.device_id !=="bin-monitor-1" && instance.end_device_ids.device_id !=="om-demo-2" )
+            if(instance.end_device_ids.device_id !=="bin-monitor-1" && instance.end_device_ids.device_id !=="om-demo-2" ){
+              if(instance.uplink_message.decoded_payload==undefined){
+                console.log("-errors",instance)
+              }else
                 quantities[instance.end_device_ids.device_id]={level:instance.uplink_message.decoded_payload.bin_level}
+            }
+                
 
             let chart1=this.state.chart1
 
